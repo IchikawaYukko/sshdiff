@@ -5,3 +5,4 @@ services:
     image: golang:1.14-alpine
     volumes:
       - "./:/go/src"
+    command: "sh -c 'apk add make && /bin/sh'"
