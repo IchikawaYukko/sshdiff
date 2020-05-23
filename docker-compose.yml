@@ -2,6 +2,6 @@ version: '3'
 
 services:
   go:   # go build environment
-    image: golang:1.13-alpine
+    image: golang:1.14-alpine
     volumes:
       - "./:/go/src"

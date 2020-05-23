@@ -5,10 +5,11 @@ import (
 	"io/ioutil"
 	"os"
 	"os/exec"
+	"path/filepath"
 	"time"
 )
 
-var TEMP_DIR string = os.TempDir() + "/sshdiff"
+var TEMP_DIR string = filepath.Join(os.TempDir(), "sshdiff")
 
 func check_args() {
 	if len(os.Args) != 3+1 {
@@ -41,8 +42,8 @@ func diff(a string, b string, hostname_1 string, hostname_2 string) string {
 	t := time.Now()
 
 	var (
-		tempfile_1 string = TEMP_DIR + "/" + hostname_1 + t.Format("20060102150405")
-		tempfile_2 string = TEMP_DIR + "/" + hostname_2 + t.Format("20060102150405")
+		tempfile_1 string = filepath.Join(TEMP_DIR, hostname_1+t.Format("20060102150405"))
+		tempfile_2 string = filepath.Join(TEMP_DIR, hostname_2+t.Format("20060102150405"))
 	)
 
 	err := ioutil.WriteFile(tempfile_1, []byte(a), 0644)
