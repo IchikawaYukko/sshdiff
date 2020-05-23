@@ -2,10 +2,12 @@ package main
 
 import (
 	"fmt"
+	"bufio"
 	"io/ioutil"
 	"os"
 	"os/exec"
 	"path/filepath"
+	"strings"
 	"time"
 )
 
@@ -61,8 +63,30 @@ func diff(a string, b string, hostname_1 string, hostname_2 string) string {
 
 func run_ssh_command(host string, command string) string {
 	fmt.Println("Running command in " + host + "..." + command)
-	stdout, _ := exec.Command("ssh", host, command).Output()
-	return string(stdout)
+
+	// Prepare
+	cmd := exec.Command("ssh", host, command) // ToDo Appendable -v option
+	cmd.Stdin = strings.NewReader("PASSWORD" + "\n")
+	cmd.Stderr = os.Stderr
+	stdout, _ := cmd.StdoutPipe()
+	scanner := bufio.NewScanner(stdout)
+	scanner.Split(bufio.ScanBytes)
+
+	// Run
+	if err := cmd.Start(); err != nil {
+		fmt.Println(err)
+	}
+
+	// Collect stdout
+	var stdout_byte string
+	for scanner.Scan() {
+		stdout_byte += scanner.Text()
+	}
+
+	// Clean
+	defer stdout.Close()
+	cmd.Wait()
+	return string(stdout_byte)
 }
 
 func main() {
